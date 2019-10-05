@@ -1,0 +1,54 @@
+{% extends "profile_wishlist.html" %}
+
+{% block profilecontent %}
+{% if empty %}
+<p class='head'> You haven't purchased anything.</p>
+{% endif %}
+
+<div class="row">
+<div class='col-sm-9'>
+<table class="table">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Title</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for order in orders %}
+    <tr>
+        <td><a href="{% url 'item' order.id %}"><img src="{% url 'get_img1' order.id %}" width="40" height="80" align="center"></a></td>
+        <td>{{order.title}}</td>
+        <td>{{order.price}}</td>
+        <td>            
+            {% for comment in comments %}
+                {% if comment.product.id == order.id %}
+                     {{comment.text}}{{comment.time}}
+                     <br>
+                {% endif %}
+
+            {% endfor %}
+        </td>
+        <td>
+        <form action="{% url 'comment' order.id%}" id='shareform' method='post'>
+
+            {{ commentform.non_field_errors }}
+            {% for field in commentform.visible_fields %}
+                {{field.label_tag}}{{field}}
+                {{field.errors}}
+            {% endfor %}
+            <input type="submit" value="Comment">
+        {% csrf_token %} 
+        </form></td>
+
+
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+<div class="col-sm-6">
+</div>
+</div>
+{% endblock %}

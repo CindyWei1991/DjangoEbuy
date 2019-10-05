@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="container">
+  <h2>{{user.username}}'s shopping basket</h2> 
+  {% if empty %} 
+  <h2>Your basket is currently empty.</h2>
+  <a class="btn btn-default" href="{% url 'home' %}">Continue Shopping</a>
+  {% else %} 
+  <table class="table table-hover" id = "bag-result">   
+    <thead>
+      <tr>
+        <th class="actions" scope="col" colspan="2">Actions</th>
+        <th class="infos" scope="col" colspan="2">Product Info</th>
+        <th class="spec" scope="col" colspan="2">Your Specification</th>
+        <th class="price" scope="col" >Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in amountData %}
+      <tr>
+        <td class = "action list">
+          <div class="btn-group-vertical">
+          <a class="btn btn-default" href="{% url 'delete' item.product.id %}">Remove Item</a>
+          </div>
+        </td>
+        <td class = "product image">  
+        <a href="{% url 'item' item.product.id %}"><img src="{% url 'get_img1' item.product.id %}" width="80px" height="120px" align="center"></a>
+        </td>
+        <td class = "product infos" colspan="2">
+          <h5 id = "title{{item.id}}">{{item.product.title}}</h5>
+          <h5>In Stock</h5>
+        </td>
+        <td class = "product spec" colspan="2" id = "{{item.id}}">
+          <h5>color: {{item.product.color}}</h5>
+          <h5>size: {{item.product.size}}</h5>
+          <input type="hidden" value="{{item.product.availability}}" id="avail{{item.id}}">
+          <h5>quantity: </h5>
+          <div id = "quantityArea{{item.id}}" class="modify">
+          <h5 id="demo{{item.id}}">{{item.amount}}</h5>
+          <button type="button" class="btn btn-default change" id = "change{{item.id}}">change</button>
+          </div>
+          <div><span id ="error{{item.id}}" ></span></div>
+          {% csrf_token %}
+        </td>
+        <td class = "product price">
+          <h5>$ {{item.product.price}} ea.</h5>
+        </td>
+      </tr>
+      {% endfor %}
+      <tr>
+      <td colspan="4"></td>
+      <td class="shipping">
+        <h6>shipping:</h6>
+        <h4>{{shipping}}</h4>
+      </td>
+      <td class="shipping">
+        <h6>tax:</h6>
+        <h4>{{tax}}</h4>
+      </td>
+      <td class="total price">
+        <h6>total:</h6>
+        <h4>$ {{total}}</h4>
+      </td>
+      </tr>
+      <tr>
+      <td align="right" colspan="7">
+      <div id='paypal'>
+        <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" target="_top">
+          <!-- <input type="hidden" name="hosted_button_id" value="QEA2LDAETSK2E"> -->
+          <input type="hidden" name="cmd" value="_xclick">
+          <input type="hidden" name="business" value="cindywei1991-facilitator@gmail.com">
+          <input type="hidden" name="lc" value="BT">
+
+          <input type="hidden" name="item_name" value="Your Bag">
+          <input type="hidden" name="amount" value="{{totaltemp}}">
+          <input type="hidden" name="return" value="http://localhost:8000/ebuy/add_orders">
+          <input type="hidden" name="cancel_return" value="http://localhost:8000/ebuy/add_orders">
+          <input type="hidden" name="currency_code" value="USD">
+          <input type="hidden" name="button_subtype" value="services">
+          <input type="hidden" name="no_note" value="0">
+          <input type="hidden" name="tax_rate" value="7.000">
+          <input type="hidden" name="shipping" value="8.00">
+          <input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynowCC_LG.gif:NonHostedGuest">
+          <input type="image" src="https://www.sandbox.paypal.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+          <input type="hidden" name="amount" value="{{totaltemp}}">
+          <input type="hidden" name="currency_code" value="USD">
+          <img alt="" border="0" src="https://www.sandbox.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+        </form>
+
+      </div>
+      </td>
+      </tr>
+      <script src="{% static 'js/bagJS.js' %}"></script>
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block extrahead %}
+    <style type="text/css">
+        .container{
+            background-image: url("/static/img/profilebg.jpg");
+            background-size:cover;
+            width: 100%;
+            height:50px;
+            margin-top:5em;
+            padding-bottom: 30em;
+            padding-left: 3em;
+            position: relative;
+        }
+        .container #profile img, #profile{
+            max-width: 8em;
+            max-height: 8em;
+            position: absolute;
+            margin: auto;
+            top: 0;
+            left: 0
+            right: 0;
+            bottom: 0;
+        }
+        #editbtn{
+            background-color: #FF1493;
+            width: 6em;
+            height: 2em;
+            border-style: none;
+            
+        }
+        #profilenav{
+            position: absolute;
+            bottom:0px;
+            font-family: Courier;
+            opacity: 0.7;
+            background-color:black;
+            width: 100%;
+            font-size: 17px;
+        }
+        .bg{
+            background-color: white;
+        }
+        #fielderror{
+            color: red;
+            font-size: 10px;
+        }
+        #info,#prevorder{
+            font-size: 20px;
+            font-family: cursive;
+        }
+        #info{
+            border:2px solid pink;
+            padding: 20px;
+        }
+        .large{
+            font-family: cursive;
+            font-size: 60px;
+            position: absolute;
+            top:35%;
+            left: 35%;
+        }
+
+    </style>
+    <script type="text/javascript">
+    $("document").ready(function() {
+        $("#dialog").dialog({
+            autoOpen:false,
+            modal:true,
+            buttons: [
+            {
+                text:"Confirm",
+                click:function(){
+                    $("#editform").submit();
+                }
+            },
+            {
+                text:"Cancel",
+                click: function(){
+                    $(this).dialog("close");
+                }
+            }
+            ]
+        });
+        $("#editbtn").click(function(){
+            $("#dialog").dialog("open");
+        });
+        $(".ui-dialog-titlebar").hide();
+        if ($("#status").val()=='error'){
+            $("#dialog").dialog("open");
+        };
+
+
+    });
+
+</script>
+<script type="text/javascript">
+    $(function(){
+        console.log($(this));
+        $("a").each(function(){
+            $(this).click(function(){
+                console.log($(this));
+                $(this).addClass('bg');
+            })
+            
+        })
+    })
+</script>
+
+
+
+{% block otherjs%}
+
+{% endblock %}
+
+{% endblock %}
+
+{% block content %}
+
+<input type="hidden" value='{{status}}' id='status'>
+
+<div class="container">
+    <p class='large'>Welcome {{user.username}}</p>
+
+    <div class='row'>
+        <div id='profilenav' class='col-md-6'>
+            <ul class='nav nav-tabs'>
+                <li><a href="{% url 'profile' %}">Home</a></li>
+                <li><a href="{% url 'orders' %}">Previous Orders</a></li>
+                <li><a href="{% url 'profile_share' %}">Share Your Favorites</a></li>
+                <li><a href="{% url 'profile_wishlist' %}">Wish List</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+{% block profilecontent %}
+<div class='row'>
+    <div class='col-sm-3'>
+        <div id='profilecontent'>
+            <div id='dialog' title="Edit your profile">
+                <form action="{% url 'profile' %}" id='editform' method='post' enctype="multipart/form-data">
+                {{ editform.non_field_errors }}
+            
+                {% for field in editform.visible_fields %}
+                    <p id='fielderror'></p>
+                        {{field.label_tag}}<br>{{field}}
+                        <span id='fielderror'>{{field.errors}}</span>
+                        {% endfor %}
+                        <span id='error'></span>
+                    {% csrf_token %} 
+                </form>
+            </div>
+            <div id='info'>
+                <div class='row'>
+                    <div class="col-sm-6">
+                        <img src="{% url 'get_profilephoto' user.id %}" class="img-circle" alt="your image" width="100" height="100">
+                    </div>
+                    <div class="col-sm-6">
+                        First Name:{{ profile.firstName }}<br>
+                        Last Name:{{ profile.lastName }}<br>
+                        Age:{{ profile.age }}<br><br>
+                        <button id="editbtn">
+                            Edit Profile
+                        </button><br>
+                    </div>
+                </div>
+            
+
+            </div> 
+        </div>
+    </div>
+    
+
+    {% for product in allshares %}
+    <div class="col-sm-3">
+        <div class='thumbnail'>
+            <img src="{% url 'get_share_img1' product.id %}" width="100%" height="40%">
+            <div class='caption'>
+            {{product.title}}<br>
+            {{product.text}}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    
+</div>
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="container">
+  <h2>{{user.username}}'s wishlist</h2> 
+  {% if empty %} 
+  <h2>Your wishlist is currently empty.</h2>
+  <a class="btn btn-default" href="{% url 'home' %}">Continue Shopping</a>
+  {% else %} 
+  <table class="table table-hover" id = "bag-result">   
+    <thead>
+      <tr>
+        <th class="actions" scope="col" colspan="2">Actions</th>
+        <th class="infos" scope="col" colspan="2">Product Info</th>
+        <th class="spec" scope="col" colspan="2">Your Specification</th>
+        <th class="price" scope="col" >Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in wishes %}
+      <tr>
+        <td class = "action list">
+          <div class="btn-group-vertical">
+          <a class="btn btn-default" href="{% url 'removeWish' item.id %}">Remove Item</a>
+          <a class="btn btn-default" href="{% url 'putInBag' item.id %}">Move to shopping bag</a>
+          </div>
+        </td>
+        <td class = "product image">  
+        <a href="{% url 'item' item.id %}"><img src="{% url 'get_img1' item.id %}" width="80px" height="120px" align="center"></a>
+        </td>
+        <td class = "product infos" colspan="2">
+          <h5 id = "title{{item.id}}">{{item.title}}</h5>
+          <h5>In Stock</h5>
+        </td>
+        <td class = "product spec" colspan="2" id = "{{item.id}}">
+          <h5>color: {{item.color}}</h5>
+          <h5>size: {{item.size}}</h5>
+        </td>
+        <td class = "product price">
+          <h5>$ {{item.price}} ea.</h5>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endblock %}

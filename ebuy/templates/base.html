@@ -1,0 +1,175 @@
+<!DOCTYPE HTML>
+{% load staticfiles %}
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{% static 'css/base.css' %}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+        <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <title>{% block title %} ebuy {% endblock %}</title>
+        {% block extrahead %}
+        {% endblock %}
+    </head>
+
+    <script type="text/javascript">
+    $(function(){
+        $.getJSON("/ebuy/get-title-json",successFn)
+    })
+    function successFn(result){
+        var titles = [];
+        $.each(result, function(i, item){
+            titles.push(item.fields.title)
+        });
+        $("#search").autocomplete({
+            source:titles,
+            autocomplete:true
+        });
+    }
+    </script>
+<body>
+    <div class="navbardiv">
+        {% block navbar %}
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>                     
+                </button>
+                
+                <a class="navbar-brand" href="{% url 'home' %}">Welcome to E-BUY</a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav navbar-right">
+                    {% if request.user.is_authenticated %}
+                        <li><a href="{% url 'profile' %}">Hello {{request.user.username}}</a></li>
+                    {% endif %}
+                    {% if not request.user.is_authenticated %}
+                        <li><a href="{% url 'register' %}"  id="login"><span class="glyphicon glyphicon-user"></span>REGISTER</a></li>
+                        <li><a href="{% url 'login' %}"  id="register"><span class="glyphicon glyphicon-log-in"></span>LOG IN</a></li>
+                        {% else %}
+                        <li><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"></span> 
+                        Log Out</a></li>
+                    {% endif %}
+                        <li><a href="{% url 'bag' %}" id='shoppingbag'><span class="glyphicon glyphicon-shopping-cart">Shopping Bag</span></a></li>
+                        <li><a href="{% url 'wishlist' %}">Wish list</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <nav class="navbar navbar-default navbar-static-top secondnavbar" style='top:4em'>
+            <div class="container-fluid">
+                <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar2">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>                     
+                </button>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar2">
+                    <ul class="nav navbar-nav" style="text-align:center">
+                        <li><a href="{% url 'displayByCategory' 'DEC' %}">DECOR</a></li>
+                        <li><a href="{% url 'displayByCategory' 'PIL' %}">PILLOWS</a></li>
+                        <li><a href="{% url 'displayByCategory' 'FUR' %}">FURNITURE</a></li>                        
+                        <li><a href="{% url 'displayByCategory' 'PET' %}">PET PRODUCT</a></li>
+                        <li><a href="{% url 'displayByCategory' 'GIF' %}">GIFTS</a></li>
+                        <li><a href="{% url 'displayByCategory' 'CER' %}">CERAMICS</a></li>
+                        <li><a href="{% url 'displayall' %}">ALL HOME</a></li>
+                    </ul>
+                    <div class="col-sm-3 col-md-3 pull-right">
+                        <form class="navbar-form" role="search" action="{% url 'display_by_search' %}" method="post">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search" name="search" id="search">
+                                <div class="input-group-btn">
+                                <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+                                </div>
+                            </div>
+                        {% csrf_token %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </nav> 
+        {% if user.is_authenticated %}
+        <div class="hovermodal">
+             <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" id='hide'></button>
+              <!-- Modal -->
+              <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog">
+                
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Your shopping bag</h4>
+                    </div>
+                    <div class="modal-body">
+                            <table>
+                            {% for item in amountData %}
+                              <tr>
+                                <td class = "product image" colspan="1">
+                                <a href="{% url 'item' item.product.id %}"><img src="{% url 'get_img1' item.product.id %}" width="60" height="80" align="center"></a>
+                                </td>
+                                <td class = "product infos" colspan="2">
+                                  <h5 id = "title{{item.id}}">{{item.product.title}}</h5>
+                                </td>
+                                <td class = "product spec" colspan="2" id = "{{item.id}}">                 
+                                  <h5>quantity:{{item.amount}} </h5>
+                                </td>
+                                <td class = "product price">
+                                  <h5>$ {{item.product.price}} ea.</h5>
+                                </td>
+                              </tr>
+                              <tr><td><br></td></tr>
+                            {% endfor %}
+                            </table>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      <a href="{% url 'bag' %}"><button type="button" class="btn btn-default">Checkout</button></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div> 
+        {% endif %} 
+        <script type="text/javascript">
+            $("#hide").hide()
+            var currlocation = $(location).attr('pathname'); 
+            console.log(currlocation.indexOf('/ebuy/item/'))
+            if (currlocation.indexOf('/ebuy/item/')!=-1){
+                $("#shoppingbag")
+                .mouseover(function(){
+                    $("#hide").click();
+
+                })
+            }
+        </script>
+        {% endblock %}
+        </div>
+
+        <div class="content">
+        {% block content %}
+        {% endblock %}
+        </div>
+        
+        <div class='footer'>
+        {% block otherlinks %}
+        <footer class="footer-basic-centered">
+
+        <p class="footer-company-motto">Decorate your home.</p>
+
+        <p class="footer-company-name">E-BUY &copy; 2016</p>
+
+        </footer>
+        {% endblock %}
+        </div>
+
+</body>
+</html>

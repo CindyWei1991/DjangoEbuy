@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block extrahead %}
+<style type="text/css">
+    .container {
+        background-image: url("/static/img/loginbg.jpg");
+        width: 100%;
+        min-height: 600px;
+        background-color: white;
+        background-size:cover;
+        margin-top: 5em;
+        padding: 10px 40px;
+        text-align: center;
+        position: relative;
+        opacity: .95;
+        border-radius: 4px;
+        box-shadow: 0 1px 0 rgba(0,0,0,.25);
+    }
+    #login_error{
+        margin-top: 4em;
+        font-size: 20px;
+    }
+    #loginform{
+        background-color: white;
+        width:50%;
+        position: absolute;
+        right:5em;
+        top:3em;
+        bottom: 3em;
+
+    }
+    #signinbtn,#signupbtn{
+        background-color: #FF1493;    
+    }
+    #signupbtn{
+        height: 40px;
+        width:30%;
+
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class='container'> 
+    <div id='loginform'>
+    <p class="head">Please sign in</p>
+        {% if form.errors %}
+        <p style="color:red">
+            Incorrect user name and password.
+        </p>
+        {% endif %}
+        <form method="post" action="{% url 'login' %}">
+
+            {{ form.username.label_tag }}<br><br>
+            {{ form.username }}<br><br>
+            {{ form.password.label_tag }}<br><br>
+            {{ form.password }}<br><br>
+                <input class="btn btn-default" type="submit" value="Sign In" id='signinbtn'>
+               <hr>
+               <p class="head">
+                New to ebuy? Create your account in just a few seconds!
+                <p>
+                <a class='btn btn-default' href="{% url 'register' %}" id='signupbtn'>Sign Up</a>
+                <input class="login" type="hidden" name="next" value="{{ next }}" />
+        {% csrf_token %} 
+        </form>
+    </div>
+
+</div>
+<script type="text/javascript">
+ $(function(){
+    $("#loginform").find("input").css({"height":"40px",
+                                "width":"90%",
+                                });
+    $("#loginform").find("label").css({"position":"absolute",
+                                        "left":"2em",
+                                        "font-size":"20px",
+                                        "font-family":"cursive"
+                                
+                                });
+ })
+    
+</script>
+{% endblock %}
+
+

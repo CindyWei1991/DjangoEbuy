@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+            {% for product in products %}
+                <section class="col-sm-3">
+                    <a href="{% url 'item' product.id %}"><img src="{% url 'get_img1' product.id %}" width="100%" height="40%" align="center"></a>
+                    <h4>{{product.title}}</h4>
+                </section>
+            {% endfor %}
+    </div>
+{% endblock %}
